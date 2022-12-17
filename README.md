@@ -12,5 +12,6 @@ Students are expected to:
 Student Info
 =======================
 
-* Name: MyName
+* Name: Nguyen Tat Hung
+* Student ID: M20.ICT.003
 
