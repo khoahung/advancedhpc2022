@@ -18,6 +18,20 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from numpy import asarray
 
+
+img = cv.imread("example-orig.jpg")
+
+im_resized = cv.resize(img, (224, 224), interpolation=cv.INTER_LINEAR)
+plt.imshow(cv.cvtColor(im_resized, cv.COLOR_BGR2RGB))
+plt.axis('off')
+plt.show()
+
+x_data = np.array(img)
+flatSrc = x_data.flatten()
+
+imageWidth,imageHeight,c = x_data.shape
+print(x_data.shape)
+
 @cuda.jit
 def sum1D(src, dst, sharedSize):
       # shared memory declaration for caching block content cache = cuda.shared.array((sharedSize, ), np.float32) localtid = threadIdx.x
@@ -33,3 +47,10 @@ def sum1D(src, dst, sharedSize):
         s=s*2
       # only first thread writes back to dst
       if localtid == 0: dst[blockIdx.x] = cache[0]
+
+
+pixelCount = imageWidth * imageHeight
+
+devSrc = cuda.to_device(x_data)
+devDst = cuda.device_array((pixelCount, 3), np.uint8)
+sum1D(devSrc,devDst,64)
