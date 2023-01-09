@@ -22,7 +22,7 @@ print(pad_img.shape)
 
 
 @cuda.jit
-def RGB2HSV(src, dst):
+def convertGPU(src, dst):
     tidx = cuda.threadIdx.x + cuda.blockIdx.x * cuda.blockDim.x
     tidy = cuda.threadIdx.y + cuda.blockIdx.y * cuda.blockDim.y
     mx = max(src[tidx, tidy, 0], src[tidx, tidy, 1], src[tidx, tidy, 2])
@@ -149,7 +149,7 @@ def ImageShared(srcRGB, srcHSV, dst, padsize):
 
 
 rgbInput = cuda.to_device(pad_img)
-RGB2HSV[gridSize, blockSize](rgbInput, hsvOutput)
+convertGPU[gridSize, blockSize](rgbInput, hsvOutput)
 hsvmid = hsvOutput.copy_to_host()
 vmid = hsvmid[2]
 vinput = cuda.to_device(vmid)
